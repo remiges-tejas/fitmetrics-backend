@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: mailpass
+      MYSQL_DATABASE: bmi_db
+      MYSQL_USER: tejas
+      MYSQL_PASSWORD: mailpass
+    ports:
+      - "3307:3306"  # Change host port to 3307
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - springboot-network
+
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/bmi_db  # Keep this as is for internal communication
+      SPRING_DATASOURCE_USERNAME: tejas
+      SPRING_DATASOURCE_PASSWORD: mailpass
+    networks:
+      - springboot-network
+
+volumes:
+  mysql-data:
+
+networks:
+  springboot-network:
